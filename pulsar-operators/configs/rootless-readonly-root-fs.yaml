@@ -1,0 +1,93 @@
+---
+apiVersion: zookeeper.streamnative.io/v1alpha1
+kind: ZooKeeperCluster
+metadata:
+  name: zookeepers
+spec:
+  image: streamnative/sn-platform-slim:3.1.1.1
+  pod:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 256Mi
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 10000
+      runAsGroup: 10001
+      fsGroup: 10001
+      readOnlyRootFilesystem: true      
+  persistence:
+    data:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 8Gi
+    dataLog:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 2Gi
+    reclaimPolicy: Delete
+  replicas: 3
+---
+apiVersion: bookkeeper.streamnative.io/v1alpha1
+kind: BookKeeperCluster
+metadata:
+  name: bookies
+spec:
+  image: streamnative/sn-platform-slim:3.1.1.1
+  replicas: 3
+  pod:
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 10000
+      runAsGroup: 10001
+      fsGroup: 10001
+      readOnlyRootFilesystem: true      
+  storage:
+    journal:
+      numDirsPerVolume: 1
+      numVolumes: 1
+      volumeClaimTemplate:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 8Gi
+    ledger:
+      numDirsPerVolume: 1
+      numVolumes: 1
+      volumeClaimTemplate:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 16Gi
+    reclaimPolicy: Delete
+  zkServers: zookeepers-zk:2181
+---
+apiVersion: pulsar.streamnative.io/v1alpha1
+kind: PulsarBroker
+metadata:
+  name: brokers
+spec:
+  image: streamnative/sn-platform-slim:3.1.1.1
+  pod:
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 10000
+      runAsGroup: 10001
+      fsGroup: 10001
+      readOnlyRootFilesystem: true
+  replicas: 2
+  zkServers: zookeepers-zk:2181
