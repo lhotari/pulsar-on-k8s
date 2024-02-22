@@ -3,8 +3,6 @@ apiVersion: zookeeper.streamnative.io/v1alpha1
 kind: ZooKeeperCluster
 metadata:
   name: zookeepers
-  annotations:
-    cloud.streamnative.io/omit-init-sysctl: "true"  
 spec:
   image: streamnative/sn-platform-slim:3.1.1.1
   pod:
@@ -38,8 +36,6 @@ apiVersion: bookkeeper.streamnative.io/v1alpha1
 kind: BookKeeperCluster
 metadata:
   name: bookies
-  annotations:
-    cloud.streamnative.io/omit-init-sysctl: "true"  
 spec:
   image: streamnative/sn-platform-slim:3.1.1.1
   replicas: 3
